@@ -1,0 +1,16 @@
+--- a/v2rayN/v2rayN.Desktop/Views/MainWindow.axaml.cs
++++ b/v2rayN/v2rayN.Desktop/Views/MainWindow.axaml.cs
+@@ -330,12 +330,14 @@
+                     : !AppManager.Instance.ShowInTaskbar);
+         if (bl)
+         {
++            Logging.SaveLog($"[ShowHideWindow] {DateTime.Now:HH:mm:ss.fff} enter, WindowState={WindowState}");
+             Show();
+             if (WindowState == WindowState.Minimized)
+             {
+                 WindowState = WindowState.Normal;
+             }
+             Activate();
+             Focus();
++            Logging.SaveLog($"[ShowHideWindow] {DateTime.Now:HH:mm:ss.fff} Activate+Focus done");
+         }
