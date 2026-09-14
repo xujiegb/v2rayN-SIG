@@ -1,41 +1,41 @@
---- a/v2rayN/v2rayN.Desktop/App.axaml.cs  
-+++ b/v2rayN/v2rayN.Desktop/App.axaml.cs  
-@@ -49,6 +49,7 @@  
-         }  
-   
-         var isMiniaturized = MacAppUtils.IsWindowMiniaturized(mainWindow);  
-+        Logging.SaveLog($"[MacReopen] {DateTime.Now:HH:mm:ss.fff} isMiniaturized={isMiniaturized} showInDock={AppManager.Instance.Config.UiItem.MacOSShowInDock}");  
-   
-         Dispatcher.UIThread.Post(() =>  
-         {  
-@@ -85,7 +86,11 @@  
-             .Where(state => state != WindowState.Minimized)  
-             .Take(1)  
-             .ObserveOn(RxSchedulers.MainThreadScheduler)  
--            .Subscribe(_ => QueueMacOSAccessoryPolicyRestore(mainWindow));  
-+            .Subscribe(_ =>  
-+            {  
-+                Logging.SaveLog($"[MacWindowStateRestored] {DateTime.Now:HH:mm:ss.fff}");  
-+                QueueMacOSAccessoryPolicyRestore(mainWindow);  
-+            });  
-     }  
-   
-     private static void QueueMacOSAccessoryPolicyRestore(MainWindow mainWindow)  
-@@ -96,13 +101,17 @@  
-   
-     private static void RestoreMacOSAccessoryPolicy(MainWindow mainWindow)  
-     {  
--        if (AppManager.Instance.Config.UiItem.MacOSShowInDock || MacAppUtils.IsWindowMiniaturized(mainWindow))  
-+        var stillMinimized = MacAppUtils.IsWindowMiniaturized(mainWindow);  
-+        Logging.SaveLog($"[MacRestore300ms] {DateTime.Now:HH:mm:ss.fff} stillMinimized={stillMinimized} showInDock={AppManager.Instance.Config.UiItem.MacOSShowInDock}");  
-+  
-+        if (AppManager.Instance.Config.UiItem.MacOSShowInDock || stillMinimized)  
-         {  
-             return;  
-         }  
-   
-         MacAppUtils.SetActivationPolicyAccessory();  
-         mainWindow.Activate();  
-         mainWindow.Focus();  
-+        Logging.SaveLog($"[MacRestoreDone] {DateTime.Now:HH:mm:ss.fff} SetActivationPolicyAccessory+Activate+Focus executed");  
+--- a/v2rayN/v2rayN.Desktop/App.axaml.cs
++++ b/v2rayN/v2rayN.Desktop/App.axaml.cs
+@@ -49,6 +49,7 @@
+         }
+
+         var isMiniaturized = MacAppUtils.IsWindowMiniaturized(mainWindow);
++        Logging.SaveLog($"[MacReopen] {DateTime.Now:HH:mm:ss.fff} isMiniaturized={isMiniaturized} showInDock={AppManager.Instance.Config.UiItem.MacOSShowInDock}");
+
+         Dispatcher.UIThread.Post(() =>
+         {
+@@ -85,7 +86,11 @@
+             .Where(state => state != WindowState.Minimized)
+             .Take(1)
+             .ObserveOn(RxSchedulers.MainThreadScheduler)
+-            .Subscribe(_ => QueueMacOSAccessoryPolicyRestore(mainWindow));
++            .Subscribe(_ =>
++            {
++                Logging.SaveLog($"[MacWindowStateRestored] {DateTime.Now:HH:mm:ss.fff}");
++                QueueMacOSAccessoryPolicyRestore(mainWindow);
++            });
+     }
+
+     private static void QueueMacOSAccessoryPolicyRestore(MainWindow mainWindow)
+@@ -96,13 +101,17 @@
+
+     private static void RestoreMacOSAccessoryPolicy(MainWindow mainWindow)
+     {
+-        if (AppManager.Instance.Config.UiItem.MacOSShowInDock || MacAppUtils.IsWindowMiniaturized(mainWindow))
++        var stillMinimized = MacAppUtils.IsWindowMiniaturized(mainWindow);
++        Logging.SaveLog($"[MacRestore300ms] {DateTime.Now:HH:mm:ss.fff} stillMinimized={stillMinimized} showInDock={AppManager.Instance.Config.UiItem.MacOSShowInDock}");
++
++        if (AppManager.Instance.Config.UiItem.MacOSShowInDock || stillMinimized)
+         {
+             return;
+         }
+
+         MacAppUtils.SetActivationPolicyAccessory();
+         mainWindow.Activate();
+         mainWindow.Focus();
++        Logging.SaveLog($"[MacRestoreDone] {DateTime.Now:HH:mm:ss.fff} SetActivationPolicyAccessory+Activate+Focus executed");
      }
